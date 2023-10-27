@@ -296,7 +296,7 @@ func (p *LocalPathProvisioner) Provision(ctx context.Context, opts pvController.
 	if p.config.SetupCommand == "" {
 		provisionCmd = append(provisionCmd, "/bin/sh", "/script/setup")
 	} else {
-		provisionCmd = append(provisionCmd, p.configData.SetupCommand)
+		provisionCmd = append(provisionCmd, p.config.SetupCommand)
 	}
 	if err := p.createHelperPod(ActionTypeCreate, provisionCmd, volumeOptions{
 		Name:        name,
@@ -387,10 +387,10 @@ func (p *LocalPathProvisioner) Delete(ctx context.Context, pv *v1.PersistentVolu
 		}
 		storage := pv.Spec.Capacity[v1.ResourceName(v1.ResourceStorage)]
 		cleanupCmd := make([]string, 0, 2)
-		if p.configData.TeardownCommand == "" {
+		if p.config.TeardownCommand == "" {
 			cleanupCmd = append(cleanupCmd, "/bin/sh", "/script/teardown")
 		} else {
-			cleanupCmd = append(cleanupCmd, p.configData.TeardownCommand)
+			cleanupCmd = append(cleanupCmd, p.config.TeardownCommand)
 		}
 		if err := p.createHelperPod(ActionTypeDelete, cleanupCmd, volumeOptions{
 			Name:        pv.Name,
@@ -509,14 +509,14 @@ func (p *LocalPathProvisioner) createHelperPod(action ActionType, cmd []string, 
 
 	keyToPathItems := make([]v1.KeyToPath, 0, 2)
 
-	if p.configData.SetupCommand == "" {
+	if p.config.SetupCommand == "" {
 		keyToPathItems = append(keyToPathItems, v1.KeyToPath{
 			Key:  "setup",
 			Path: "setup",
 		})
 	}
 
-	if p.configData.TeardownCommand == "" {
+	if p.config.TeardownCommand == "" {
 		keyToPathItems = append(keyToPathItems, v1.KeyToPath{
 			Key:  "teardown",
 			Path: "teardown",
