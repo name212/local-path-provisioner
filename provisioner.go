@@ -147,6 +147,9 @@ func (p *LocalPathProvisioner) refreshConfig() error {
 	p.configData = configData
 	p.config = config
 
+	logrus.Debugf("config setup command: %s", p.config.SetupCommand)
+	logrus.Debugf("config teardown command: %s", p.config.TeardownCommand)
+
 	output, err := json.Marshal(p.configData)
 	if err != nil {
 		return err
@@ -668,7 +671,11 @@ func canonicalizeConfig(data *ConfigData) (cfg *Config, err error) {
 		err = errors.Wrapf(err, "config canonicalization failed")
 	}()
 	cfg = &Config{}
+	logrus.Debugf("data setup command %s\n", data.SetupCommand)
+	logrus.Debugf("data teardown command %s\n", data.TeardownCommand)
 	cfg.SharedFileSystemPath = data.SharedFileSystemPath
+	cfg.SetupCommand = data.SetupCommand
+	cfg.TeardownCommand = data.TeardownCommand
 	cfg.NodePathMap = map[string]*NodePathMap{}
 	for _, n := range data.NodePathMap {
 		if cfg.NodePathMap[n.Node] != nil {
@@ -698,9 +705,6 @@ func canonicalizeConfig(data *ConfigData) (cfg *Config, err error) {
 	} else {
 		cfg.CmdTimeoutSeconds = defaultCmdTimeoutSeconds
 	}
-
-	cfg.SetupCommand = data.SetupCommand
-	cfg.TeardownCommand = data.TeardownCommand
 
 	return cfg, nil
 }
