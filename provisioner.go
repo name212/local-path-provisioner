@@ -94,6 +94,8 @@ type Config struct {
 	NodePathMap          map[string]*NodePathMap
 	CmdTimeoutSeconds    int
 	SharedFileSystemPath string
+	SetupCommand         string
+	TeardownCommand      string
 }
 
 func NewProvisioner(ctx context.Context, kubeClient *clientset.Clientset,
@@ -291,7 +293,7 @@ func (p *LocalPathProvisioner) Provision(ctx context.Context, opts pvController.
 
 	storage := pvc.Spec.Resources.Requests[v1.ResourceName(v1.ResourceStorage)]
 	provisionCmd := make([]string, 0, 2)
-	if p.configData.SetupCommand == "" {
+	if p.config.SetupCommand == "" {
 		provisionCmd = append(provisionCmd, "/bin/sh", "/script/setup")
 	} else {
 		provisionCmd = append(provisionCmd, p.configData.SetupCommand)
@@ -696,6 +698,10 @@ func canonicalizeConfig(data *ConfigData) (cfg *Config, err error) {
 	} else {
 		cfg.CmdTimeoutSeconds = defaultCmdTimeoutSeconds
 	}
+
+	cfg.SetupCommand = data.SetupCommand
+	cfg.TeardownCommand = data.TeardownCommand
+
 	return cfg, nil
 }
 
