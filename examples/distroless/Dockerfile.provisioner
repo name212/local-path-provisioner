@@ -5,6 +5,8 @@ ARG GIT_BRANCH
 
 RUN apk add --no-cache git
 
+RUN echo "cache 1"
+
 ENV GIT_REPO=$GIT_REPO
 ENV GIT_BRANCH=$GIT_BRANCH
 

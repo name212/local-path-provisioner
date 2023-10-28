@@ -3,7 +3,6 @@ kind: Kustomization
 
 resources:
 - local-path-storage.yaml
-- sts.yaml
 
 configMapGenerator:
 - name: local-path-config

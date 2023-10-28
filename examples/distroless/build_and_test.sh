@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -e
 
 source=$1
 branch=$2
@@ -24,3 +24,15 @@ kind load docker-image --name test-lpp-distroless lpp-distroless-provider:v0.0.1
 kind load docker-image --name test-lpp-distroless lpp-distroless-helper:v0.0.1 lpp-distroless-helper:v0.0.1
 
 kubectl apply -k .
+
+echo "Waiting 30 seconds before deploy sts"
+
+sleep 30
+
+kubectl create -f sts.yaml
+
+echo "Waiting 15 seconds before getting pv"
+
+sleep 15
+
+kubectl get pv

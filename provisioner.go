@@ -147,9 +147,6 @@ func (p *LocalPathProvisioner) refreshConfig() error {
 	p.configData = configData
 	p.config = config
 
-	logrus.Debugf("config setup command: %s", p.config.SetupCommand)
-	logrus.Debugf("config teardown command: %s", p.config.TeardownCommand)
-
 	output, err := json.Marshal(p.configData)
 	if err != nil {
 		return err
@@ -513,7 +510,6 @@ func (p *LocalPathProvisioner) createHelperPod(action ActionType, cmd []string, 
 	keyToPathItems := make([]v1.KeyToPath, 0, 2)
 
 	if p.config.SetupCommand == "" {
-		logrus.Debug("Setup command is empty. Use configmap script")
 		keyToPathItems = append(keyToPathItems, v1.KeyToPath{
 			Key:  "setup",
 			Path: "setup",
@@ -521,7 +517,6 @@ func (p *LocalPathProvisioner) createHelperPod(action ActionType, cmd []string, 
 	}
 
 	if p.config.TeardownCommand == "" {
-		logrus.Debug("Teardown command is empty. Use configmap script")
 		keyToPathItems = append(keyToPathItems, v1.KeyToPath{
 			Key:  "teardown",
 			Path: "teardown",
@@ -529,7 +524,6 @@ func (p *LocalPathProvisioner) createHelperPod(action ActionType, cmd []string, 
 	}
 
 	if len(keyToPathItems) > 0 {
-		logrus.Debug("Scrips in use. Add volumes")
 		lpvVolumes = append(lpvVolumes, v1.Volume{
 			Name: "script",
 			VolumeSource: v1.VolumeSource{
@@ -584,8 +578,6 @@ func (p *LocalPathProvisioner) createHelperPod(action ActionType, cmd []string, 
 	helperPod.Spec.Containers[0].SecurityContext = &v1.SecurityContext{
 		Privileged: &privileged,
 	}
-
-	logrus.Debug("helper pods args", helperPod.Spec.Containers[0].Args)
 
 	// If it already exists due to some previous errors, the pod will be cleaned up later automatically
 	// https://github.com/rancher/local-path-provisioner/issues/27
@@ -676,8 +668,6 @@ func canonicalizeConfig(data *ConfigData) (cfg *Config, err error) {
 		err = errors.Wrapf(err, "config canonicalization failed")
 	}()
 	cfg = &Config{}
-	logrus.Debugf("data setup command %s\n", data.SetupCommand)
-	logrus.Debugf("data teardown command %s\n", data.TeardownCommand)
 	cfg.SharedFileSystemPath = data.SharedFileSystemPath
 	cfg.SetupCommand = data.SetupCommand
 	cfg.TeardownCommand = data.TeardownCommand
